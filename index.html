@@ -129,13 +129,14 @@
     ];
 
     // Connect securely using variables loaded from config.js
-   const client = mqtt.connect("wss://" + MQTT_CONFIG.broker + ":8884/mqtt", options);
-      clientId: 'Web_Dashboard_' + Math.random().toString(16).substring(2, 8),
-      username: MQTT_CONFIG.username,
-      password: MQTT_CONFIG.password,
-      clean: true
-    };
+  const options = {
+    clientId: 'Web_Dashboard_' + Math.random().toString(16).substring(2, 8),
+    username: MQTT_CONFIG.username,
+    password: MQTT_CONFIG.password,
+    clean: true
+};
 
+  const client = mqtt.connect("wss://" + MQTT_CONFIG.broker + ":8884/mqtt", options);
     const client = mqtt.connect(MQTT_CONFIG.broker, options);
 
     client.on('connect', function () {
