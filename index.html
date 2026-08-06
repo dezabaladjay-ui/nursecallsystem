@@ -5,6 +5,8 @@
   <title>Global Cloud Nurse Call Dashboard</title>
   <!-- Include MQTT.js via CDN for browser WebSocket support -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+  <!-- Include Secure External Config File -->
+  <script src="config.js"></script>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f9; margin: 0; padding: 15px; box-sizing: border-box; }
     h2 { color: #333; margin-bottom: 5px; }
@@ -102,23 +104,22 @@
     let audioCtx = null;
     let lastBeepTime = 0;
 
-    // --- PLACE THE WATCHDOG TIMER HERE ---
-  setInterval(() => {
-    let now = Date.now();
-    let needsRender = false;
+    // Watchdog Timer
+    setInterval(() => {
+      let now = Date.now();
+      let needsRender = false;
 
-    roomData.forEach((r, i) => {
-      // If a room was marked online, but hasn't sent a message in 10 seconds
-      if (r.online && (now - r.lastSeen > 10000)) {
-        r.online = false;
-        needsRender = true;
+      roomData.forEach((r, i) => {
+        if (r.online && (now - r.lastSeen > 10000)) {
+          r.online = false;
+          needsRender = true;
+        }
+      });
+
+      if (needsRender) {
+        renderDashboard();
       }
-    });
-
-    if (needsRender) {
-      renderDashboard();
-    }
-  }, 3000);
+    }, 3000);
     
     // Room Data State Array (3 Rooms)
     let roomData = [
@@ -127,16 +128,15 @@
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }
     ];
 
-    // Connect directly to HiveMQ Cloud via WebSockets (Port 8884)
-    const brokerUrl = 'wss://8489829bb9624d2b82642b5272686b5c.s1.eu.hivemq.cloud:8884/mqtt';
+    // Connect securely using variables loaded from config.js
     const options = {
       clientId: 'Web_Dashboard_' + Math.random().toString(16).substring(2, 8),
-      username: 'ULRC',
-      password: 'unlisabaw',
+      username: MQTT_CONFIG.username,
+      password: MQTT_CONFIG.password,
       clean: true
     };
 
-    const client = mqtt.connect(brokerUrl, options);
+    const client = mqtt.connect(MQTT_CONFIG.broker, options);
 
     client.on('connect', function () {
       document.getElementById('connection-status').innerText = "Status: Connected to Cloud ✔";
@@ -180,7 +180,6 @@
             roomData[idx].cbActive = false; roomData[idx].astActive = false;
           }
         } catch(e) {
-          // Fallback if message is plain string
           if (message.indexOf("E1") !== -1) {
             if (!roomData[idx].cbActive) { roomData[idx].cbActive = true; roomData[idx].cbStart = now; roomData[idx].cbElapsed = 0; }
           } else if (message.indexOf("A1") !== -1) {
@@ -322,7 +321,6 @@
       }
     }
 
-    // Trigger actions from control panel directly to HiveMQ Cloud
     function sendAction(roomNum, cmd) {
       let idx = roomNum - 1;
       let now = Date.now();
@@ -336,12 +334,10 @@
       }
       renderDashboard();
 
-      // Publish command straight to cloud topic
       let topic = "hospital/room/" + roomNum + "/command";
       client.publish(topic, cmd);
     }
 
-    // Timer increment loop
     setInterval(() => {
       let updated = false;
       for(let i=0; i<roomData.length; i++) {
@@ -354,4 +350,4 @@
     renderDashboard();
   </script>
 </body>
-</html>
+</html> 
