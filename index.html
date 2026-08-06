@@ -7,6 +7,7 @@
   <script src="mqtt.js"></script>
   <!-- Include Secure External Config File -->
   <script src="config.js"></script>
+  <script src="nursecallsystem.js"></script>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f9; margin: 0; padding: 15px; box-sizing: border-box; }
     h2 { color: #333; margin-bottom: 5px; }
@@ -129,14 +130,12 @@
     ];
 
     // Connect securely using variables loaded from config.js (Declared ONCE)
-    const options = {
-      clientId: 'Web_Dashboard_' + Math.random().toString(16).substring(2, 8),
-      username: MQTT_CONFIG.username,
-      password: MQTT_CONFIG.password,
-      clean: true
-    };
-
-    const client = mqtt.connect("wss://" + MQTT_CONFIG.broker + ":8884/mqtt", options);
+   const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
+  clientId: 'WebDashboard_' + Math.random().toString(16).substring(2, 8),
+  username: MQTT_CONFIG.MQTT_USER,
+  password: MQTT_CONFIG.MQTT_PASSWORD,
+  clean: true
+});
 
     client.on('connect', function () {
       document.getElementById('connection-status').innerText = "Status: Connected to Cloud ✔";
