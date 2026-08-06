@@ -3,6 +3,7 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: ["main"]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,11 +17,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Inject Secrets into Config
+      - name: Generate Secure config.js from Secrets
         run: |
-          sed -i 's|"BROKER_PLACEHOLDER"|"${{ secrets.MQTT_BROKER }}"|g' config.js
-          sed -i 's|"USERNAME_PLACEHOLDER"|"${{ secrets.MQTT_USERNAME }}"|g' config.js
-          sed -i 's|"PASSWORD_PLACEHOLDER"|"${{ secrets.MQTT_PASSWORD }}"|g' config.js
+          echo "const MQTT_CONFIG = {" > config.js
+          echo "  MQTT_BROKER: '${{ secrets.MQTT_BROKER }}'," >> config.js
+          echo "  MQTT_USER: '${{ secrets.MQTT_USER }}'," >> config.js
+          echo "  MQTT_PASSWORD: '${{ secrets.MQTT_PASSWORD }}'" >> config.js
+          echo "};" >> config.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
