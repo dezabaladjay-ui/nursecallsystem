@@ -18,9 +18,9 @@ jobs:
 
       - name: Inject Secrets into Config
         run: |
-          sed -i 's|BROKER_PLACEHOLDER|${{ secrets.MQTT_BROKER }}|g' config.js
-          sed -i 's|USERNAME_PLACEHOLDER|${{ secrets.MQTT_USERNAME }}|g' config.js
-          sed -i 's|PASSWORD_PLACEHOLDER|${{ secrets.MQTT_PASSWORD }}|g' config.js
+          sed -i 's|"BROKER_PLACEHOLDER"|"${{ secrets.MQTT_BROKER }}"|g' config.js
+          sed -i 's|"USERNAME_PLACEHOLDER"|"${{ secrets.MQTT_USERNAME }}"|g' config.js
+          sed -i 's|"PASSWORD_PLACEHOLDER"|"${{ secrets.MQTT_PASSWORD }}"|g' config.js
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
