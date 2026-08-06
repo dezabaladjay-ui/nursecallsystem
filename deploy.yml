@@ -1,0 +1,45 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate Secure config.js from Secrets
+        run: |
+          echo "const MQTT_CONFIG = {" > config.js
+          echo "  MQTT_BROKER: '${{ secrets.MQTT_BROKER }}'," >> config.js
+          echo "  MQTT_USER: '${{ secrets.MQTT_USER }}'," >> config.js
+          echo "  MQTT_PASSWORD: '${{ secrets.MQTT_PASSWORD }}'" >> config.js
+          echo "};" >> config.js
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
