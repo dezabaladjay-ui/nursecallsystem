@@ -128,7 +128,7 @@
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }
     ];
 
-    // Connect securely using variables loaded from config.js
+    // Connect securely using variables loaded from config.js (Declared ONCE)
     const options = {
       clientId: 'Web_Dashboard_' + Math.random().toString(16).substring(2, 8),
       username: MQTT_CONFIG.username,
