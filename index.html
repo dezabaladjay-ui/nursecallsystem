@@ -3,57 +3,205 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Global Cloud Nurse Call Dashboard</title>
-   <script src="config.js"></script>
+  <script src="config.js"></script>
   <script src="mqtt.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f9; margin: 0; padding: 15px; box-sizing: border-box; }
-    h2 { color: #333; margin-bottom: 5px; }
-    #connection-status { font-size: 0.85em; font-weight: bold; margin-bottom: 15px; color: #e74c3c; }
-
-    .tab-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
-    .tab-btn { background: #ddd; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; color: #555; transition: background 0.2s, color 0.2s; }
-    .tab-btn.active { background: #3498db; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 95vw; margin: 0 auto; box-sizing: border-box; }
-    .card { background: white; padding: 18px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); box-sizing: border-box; }
-    
-    .card.standby { background: #ffffff; border-left: 6px solid green; }
-    .card.blue { background: #ff4d4d; border-left: 6px solid darkred; animation: flash 0.8s infinite alternate; }
-    .card.assist { background: #ffaa33; border-left: 6px solid darkorange; }
-    .card.both { background: #ff4d4d; border-left: 6px solid darkred; animation: flash 0.8s infinite alternate; }
-
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f9;
+      margin: 0;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    h2 {
+      color: #333;
+      margin-bottom: 5px;
+    }
+    #connection-status {
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-bottom: 15px;
+      color: #e74c3c;
+    }
+    .tab-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .tab-btn {
+      background: #ddd;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      color: #555;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tab-btn.active {
+      background: #3498db;
+      color: white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      width: 100%;
+      max-width: 95vw;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    .card {
+      background: white;
+      padding: 18px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    .card.standby {
+      background: #ffffff;
+      border-left: 6px solid green;
+    }
+    .card.blue {
+      background: #ff4d4d;
+      border-left: 6px solid darkred;
+      animation: flash 0.8s infinite alternate;
+    }
+    .card.assist {
+      background: #ffaa33;
+      border-left: 6px solid darkorange;
+    }
+    .card.both {
+      background: #ff4d4d;
+      border-left: 6px solid darkred;
+      animation: flash 0.8s infinite alternate;
+    }
     @keyframes flash {
       0% { background-color: #ff4d4d; }
       100% { background-color: #b30000; }
     }
-
-    h3 { margin: 0 0 5px 0; color: #222; font-size: 1.3em; text-align: center; }
-    .standby-text { font-size: 0.85em; font-weight: bold; margin-bottom: 12px; color: #555; text-align: center; letter-spacing: 1px; }
-    .standby-text.active { color: green; }
-
-    .action-row { display: flex; justify-content: space-between; gap: 10px; }
-    .ind { padding: 8px 12px; border-radius: 4px; color: #777; background: #eee; flex: 1; text-align: center; font-size: 0.9em; font-weight: bold; display: flex; flex-direction: column; gap: 4px; }
-    .ind.active-red { color: white; background: red; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .ind.active-orange { color: white; background: darkorange; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-    .timer { font-size: 0.8em; font-weight: normal; opacity: 0.9; }
-
-    .telemetry-bar { margin-top: 12px; font-size: 0.8em; color: #666; display: flex; justify-content: space-around; background: #f9f9fb; padding: 6px; border-radius: 4px; border: 1px solid #eee; }
-    .offline-badge { color: red; font-weight: bold; }
-
-    .control-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px; text-align: left; }
-    .control-card h4 { margin: 0 0 10px 0; color: #333; font-size: 1.1em; border-bottom: 2px solid #eee; padding-bottom: 5px; }
-    .btn-grid { display: flex; gap: 10px; flex-wrap: wrap; }
-    .action-btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-weight: bold; color: white; cursor: pointer; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
-    .btn-blue { background: #e74c3c; }
-    .btn-assist { background: #f39c12; }
-    .btn-reset { background: #27ae60; }
-    .action-btn:active { filter: brightness(85%); }
+    h3 {
+      margin: 0 0 5px 0;
+      color: #222;
+      font-size: 1.3em;
+      text-align: center;
+    }
+    .standby-text {
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #555;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .standby-text.active {
+      color: green;
+    }
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .ind {
+      padding: 8px 12px;
+      border-radius: 4px;
+      color: #777;
+      background: #eee;
+      flex: 1;
+      text-align: center;
+      font-size: 0.9em;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .ind.active-red {
+      color: white;
+      background: red;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .ind.active-orange {
+      color: white;
+      background: darkorange;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    .timer {
+      font-size: 0.8em;
+      font-weight: normal;
+      opacity: 0.9;
+    }
+    .telemetry-bar {
+      margin-top: 12px;
+      font-size: 0.8em;
+      color: #666;
+      display: flex;
+      justify-content: space-around;
+      background: #f9f9fb;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #eee;
+    }
+    .offline-badge {
+      color: red;
+      font-weight: bold;
+    }
+    .control-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .control-card h4 {
+      margin: 0 0 10px 0;
+      color: #333;
+      font-size: 1.1em;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    .btn-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      font-size: 0.9em;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .btn-blue {
+      background: #e74c3c;
+    }
+    .btn-assist {
+      background: #f39c12;
+    }
+    .btn-reset {
+      background: #27ae60;
+    }
+    .action-btn:active {
+      filter: brightness(85%);
+    }
   </style>
 </head>
 <body>
+
   <h2>Cloud Nurse Call System</h2>
   <div id="connection-status">Connecting to Cloud...</div>
   <div id="live-clock" style="font-size: 0.9em; color: #555; margin-bottom: 15px; font-weight: bold;">Loading clock...</div>
@@ -96,22 +244,6 @@
         <button class="action-btn btn-reset" onclick="sendAction(3, 'R')">Full Reset</button>
       </div>
     </div>
-    <div class="control-card">
-      <h4>Room 4 Controls</h4>
-      <div class="btn-grid">
-        <button class="action-btn btn-blue" onclick="sendAction(4, 'E1')">Trigger Code Blue</button>
-        <button class="action-btn btn-assist" onclick="sendAction(4, 'A1')">Trigger Assist</button>
-        <button class="action-btn btn-reset" onclick="sendAction(4, 'R')">Full Reset</button>
-      </div>
-    </div>
-    <div class="control-card">
-      <h4>Room 5 Controls</h4>
-      <div class="btn-grid">
-        <button class="action-btn btn-blue" onclick="sendAction(5, 'E1')">Trigger Code Blue</button>
-        <button class="action-btn btn-assist" onclick="sendAction(5, 'A1')">Trigger Assist</button>
-        <button class="action-btn btn-reset" onclick="sendAction(5, 'R')">Full Reset</button>
-      </div>
-    </div>
   </div>
 
   <script>
@@ -134,22 +266,21 @@
         renderDashboard();
       }
     }, 3000);
-    
-    // Room Data State Array (5 Rooms)
+
+    // Room Data State Array (3 Rooms)
     let roomData = [
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
-      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
-      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }, 
-      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }  
+      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }
     ];
-    
-   const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
-  clientId: 'WebDashboard_' + Math.random().toString(16).substring(2, 8),
-  username: MQTT_CONFIG.MQTT_USER,
-  password: MQTT_CONFIG.MQTT_PASSWORD,
-  clean: true
-});
+
+    // Connect securely using variables loaded from config.js
+    const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
+      clientId: 'WebDashboard_' + Math.random().toString(16).substring(2, 8),
+      username: MQTT_CONFIG.MQTT_USER,
+      password: MQTT_CONFIG.MQTT_PASSWORD,
+      clean: true
+    });
 
     client.on('connect', function () {
       document.getElementById('connection-status').innerText = "Status: Connected to Cloud ✔";
@@ -173,7 +304,7 @@
       let parts = topic.split('/');
       let roomNum = parseInt(parts[2]);
 
-      if (roomNum >= 1 && roomNum <= 5) {
+      if (roomNum >= 1 && roomNum <= 3) {
         let idx = roomNum - 1;
         let now = Date.now();
         
@@ -353,11 +484,11 @@
 
     setInterval(() => {
       let updated = false;
-      for(let i=0; i<roomData.length; i++) {
-        if(roomData[i].cbActive) { roomData[i].cbElapsed++; updated = true; }
-        if(roomData[i].astActive) { roomData[i].astElapsed++; updated = true; }
+      for (let i = 0; i < roomData.length; i++) {
+        if (roomData[i].cbActive) { roomData[i].cbElapsed++; updated = true; }
+        if (roomData[i].astActive) { roomData[i].astElapsed++; updated = true; }
       }
-      if(updated) renderDashboard();
+      if (updated) renderDashboard();
     }, 1000);
 
     renderDashboard();
