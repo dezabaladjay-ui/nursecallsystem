@@ -96,14 +96,16 @@
         <button class="action-btn btn-reset" onclick="sendAction(3, 'R')">Full Reset</button>
       </div>
     </div>
-    <h4>Room 4 Controls</h4>
+    <div class="control-card">
+      <h4>Room 4 Controls</h4>
       <div class="btn-grid">
         <button class="action-btn btn-blue" onclick="sendAction(4, 'E1')">Trigger Code Blue</button>
         <button class="action-btn btn-assist" onclick="sendAction(4, 'A1')">Trigger Assist</button>
         <button class="action-btn btn-reset" onclick="sendAction(4, 'R')">Full Reset</button>
       </div>
     </div>
-  <h4>Room 5 Controls</h4>
+    <div class="control-card">
+      <h4>Room 5 Controls</h4>
       <div class="btn-grid">
         <button class="action-btn btn-blue" onclick="sendAction(5, 'E1')">Trigger Code Blue</button>
         <button class="action-btn btn-assist" onclick="sendAction(5, 'A1')">Trigger Assist</button>
@@ -133,14 +135,13 @@
       }
     }, 3000);
     
-    // Room Data State Array (3 Rooms)
+    // Room Data State Array (5 Rooms)
     let roomData = [
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }, 
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }  
-];
     ];
     
    const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
