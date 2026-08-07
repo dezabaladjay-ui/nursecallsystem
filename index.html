@@ -116,7 +116,7 @@
     clean: true
   });
   
-    client.on('connect', function () {
+   client.on('connect', function () {
       document.getElementById('connection-status').innerText = "Status: Connected to Cloud ✔";
       document.getElementById('connection-status').style.color = "green";
       client.subscribe('hospital/room/+/event');
