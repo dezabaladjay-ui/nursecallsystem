@@ -109,12 +109,12 @@
     ];
 
     const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
-      clientId: 'WebDashboard_' + Math.random().toString(16).substring(2, 8),
-      username: MQTT_CONFIG.MQTT_USER,
-      password: MQTT_CONFIG.MQTT_PASSWORD,
-      clean: true
-    });
-
+    clientId: MQTT_CONFIG.clientId || ('WebDashboard_' + Math.random().toString(16).substring(2, 8)),
+    username: MQTT_CONFIG.MQTT_USERNAME,
+    password: MQTT_CONFIG.MQTT_PASSWORD,
+    clean: true
+  });
+  
     client.on('connect', function () {
       document.getElementById('connection-status').innerText = "Status: Connected to Cloud ✔";
       document.getElementById('connection-status').style.color = "green";
