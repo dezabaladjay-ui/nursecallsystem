@@ -6,219 +6,58 @@
   <script src="config.js"></script>
   <script src="mqtt.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f4f4f9;
-      margin: 0;
-      padding: 15px;
-      box-sizing: border-box;
-    }
-    h2 {
-      color: #333;
-      margin-bottom: 5px;
-    }
-    #connection-status {
-      font-size: 0.85em;
-      font-weight: bold;
-      margin-bottom: 15px;
-      color: #e74c3c;
-    }
-    .tab-bar {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .tab-btn {
-      background: #ddd;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      font-weight: bold;
-      border-radius: 6px;
-      cursor: pointer;
-      color: #555;
-      transition: background 0.2s, color 0.2s;
-    }
-    .tab-btn.active {
-      background: #3498db;
-      color: white;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-      width: 100%;
-      max-width: 95vw;
-      margin: 0 auto;
-      box-sizing: border-box;
-    }
-    .card {
-      background: white;
-      padding: 18px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      box-sizing: border-box;
-    }
-    .card.standby {
-      background: #ffffff;
-      border-left: 6px solid green;
-    }
-    .card.blue {
-      background: #ff4d4d;
-      border-left: 6px solid darkred;
-      animation: flash 0.8s infinite alternate;
-    }
-    .card.assist {
-      background: #ffaa33;
-      border-left: 6px solid darkorange;
-    }
-    .card.both {
-      background: #ff4d4d;
-      border-left: 6px solid darkred;
-      animation: flash 0.8s infinite alternate;
-    }
+    body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f9; margin: 0; padding: 15px; box-sizing: border-box; }
+    h2 { color: #333; margin-bottom: 5px; }
+    #connection-status { font-size: 0.85em; font-weight: bold; margin-bottom: 15px; color: #e74c3c; }
+    .tab-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+    .tab-btn { background: #ddd; border: none; padding: 10px 20px; font-size: 1em; font-weight: bold; border-radius: 6px; cursor: pointer; color: #555; transition: background 0.2s, color 0.2s; }
+    .tab-btn.active { background: #3498db; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 15px; width: 100%; max-width: 95vw; margin: 0 auto; box-sizing: border-box; }
+    .card { background: white; padding: 18px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); box-sizing: border-box; }
+    .card.standby { background: #ffffff; border-left: 6px solid green; }
+    .card.blue { background: #ff4d4d; border-left: 6px solid darkred; animation: flash 0.8s infinite alternate; }
+    .card.assist { background: #ffaa33; border-left: 6px solid darkorange; }
+    .card.both { background: #ff4d4d; border-left: 6px solid darkred; animation: flash 0.8s infinite alternate; }
     @keyframes flash {
       0% { background-color: #ff4d4d; }
       100% { background-color: #b30000; }
     }
-    h3 {
-      margin: 0 0 5px 0;
-      color: #222;
-      font-size: 1.3em;
-      text-align: center;
-    }
-    .standby-text {
-      font-size: 0.85em;
-      font-weight: bold;
-      margin-bottom: 12px;
-      color: #555;
-      text-align: center;
-      letter-spacing: 1px;
-    }
-    .standby-text.active {
-      color: green;
-    }
-    .action-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .ind {
-      padding: 8px 12px;
-      border-radius: 4px;
-      color: #777;
-      background: #eee;
-      flex: 1;
-      text-align: center;
-      font-size: 0.9em;
-      font-weight: bold;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .ind.active-red {
-      color: white;
-      background: red;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .ind.active-orange {
-      color: white;
-      background: darkorange;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-    .timer {
-      font-size: 0.8em;
-      font-weight: normal;
-      opacity: 0.9;
-    }
-    .telemetry-bar {
-      margin-top: 12px;
-      font-size: 0.8em;
-      color: #666;
-      display: flex;
-      justify-content: space-around;
-      background: #f9f9fb;
-      padding: 6px;
-      border-radius: 4px;
-      border: 1px solid #eee;
-    }
-    .offline-badge {
-      color: red;
-      font-weight: bold;
-    }
-    .control-card {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      margin-bottom: 15px;
-      text-align: left;
-    }
-    .control-card h4 {
-      margin: 0 0 10px 0;
-      color: #333;
-      font-size: 1.1em;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 5px;
-    }
-    .btn-grid {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .action-btn {
-      flex: 1;
-      padding: 10px;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      color: white;
-      cursor: pointer;
-      font-size: 0.9em;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-    }
-    .btn-blue {
-      background: #e74c3c;
-    }
-    .btn-assist {
-      background: #f39c12;
-    }
-    .btn-reset {
-      background: #27ae60;
-    }
-    .action-btn:active {
-      filter: brightness(85%);
-    }
+    h3 { margin: 0 0 5px 0; color: #222; font-size: 1.3em; text-align: center; }
+    .standby-text { font-size: 0.85em; font-weight: bold; margin-bottom: 12px; color: #555; text-align: center; letter-spacing: 1px; }
+    .standby-text.active { color: green; }
+    .action-row { display: flex; justify-content: space-between; gap: 10px; }
+    .ind { padding: 8px 12px; border-radius: 4px; color: #777; background: #eee; flex: 1; text-align: center; font-size: 0.9em; font-weight: bold; display: flex; flex-direction: column; gap: 4px; }
+    .ind.active-red { color: white; background: red; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .ind.active-orange { color: white; background: darkorange; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .timer { font-size: 0.8em; font-weight: normal; opacity: 0.9; }
+    .telemetry-bar { margin-top: 12px; font-size: 0.8em; color: #666; display: flex; justify-content: space-around; background: #f9f9fb; padding: 6px; border-radius: 4px; border: 1px solid #eee; }
+    .offline-badge { color: red; font-weight: bold; }
+    .control-card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); margin-bottom: 15px; text-align: left; }
+    .control-card h4 { margin: 0 0 10px 0; color: #333; font-size: 1.1em; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+    .btn-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    .action-btn { flex: 1; padding: 10px; border: none; border-radius: 5px; font-weight: bold; color: white; cursor: pointer; font-size: 0.9em; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+    .btn-blue { background: #e74c3c; }
+    .btn-assist { background: #f39c12; }
+    .btn-reset { background: #27ae60; }
+    .action-btn:active { filter: brightness(85%); }
   </style>
 </head>
 <body>
-
   <h2>Cloud Nurse Call System</h2>
   <div id="connection-status">Connecting to Cloud...</div>
   <div id="live-clock" style="font-size: 0.9em; color: #555; margin-bottom: 15px; font-weight: bold;">Loading clock...</div>
-
   <div id="audio-banner" onclick="unlockAudio()" style="background: #ff9800; color: white; padding: 10px 15px; font-size: 0.9em; font-weight: bold; margin-bottom: 15px; border-radius: 6px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.15); text-align: center;">
     [ TAP HERE TO ENABLE AUDIO ALERTS ]
   </div>
-
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('monitor', event)">Live Monitor</button>
     <button class="tab-btn" onclick="switchTab('controls', event)">Control Panel</button>
   </div>
-
   <div id="tab-monitor" class="tab-content active">
     <div class="grid" id="dashboard-grid"></div>
   </div>
-
   <div id="tab-controls" class="tab-content">
     <div class="control-card">
       <h4>Room 1 Controls</h4>
@@ -245,77 +84,59 @@
       </div>
     </div>
   </div>
-
   <script>
     let audioCtx = null;
     let lastBeepTime = 0;
-
-    // Watchdog Timer
     setInterval(() => {
       let now = Date.now();
       let needsRender = false;
-
       roomData.forEach((r, i) => {
         if (r.online && (now - r.lastSeen > 10000)) {
           r.online = false;
           needsRender = true;
         }
       });
-
       if (needsRender) {
         renderDashboard();
       }
     }, 3000);
-
-    // Room Data State Array (3 Rooms)
     let roomData = [
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }
     ];
-
-    // Connect securely using variables loaded from config.js
     const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
       clientId: 'WebDashboard_' + Math.random().toString(16).substring(2, 8),
       username: MQTT_CONFIG.MQTT_USER,
       password: MQTT_CONFIG.MQTT_PASSWORD,
       clean: true
     });
-
     client.on('connect', function () {
       document.getElementById('connection-status').innerText = "Status: Connected to Cloud ✔";
       document.getElementById('connection-status').style.color = "green";
       client.subscribe('hospital/room/+/event');
     });
-
     client.on('error', function (err) {
       document.getElementById('connection-status').innerText = "Status: Connection Error!";
       console.log("MQTT Error: ", err);
     });
-
     client.on('offline', function () {
       document.getElementById('connection-status').innerText = "Status: Offline";
       document.getElementById('connection-status').style.color = "red";
     });
-
-    // Handle Incoming Messages from Rooms
     client.on('message', function (topic, payload) {
       let message = payload.toString();
       let parts = topic.split('/');
       let roomNum = parseInt(parts[2]);
-
       if (roomNum >= 1 && roomNum <= 3) {
         let idx = roomNum - 1;
         let now = Date.now();
-        
         roomData[idx].online = true;
         roomData[idx].lastSeen = now;
-
         try {
           let data = JSON.parse(message);
           if (data.rssi !== undefined) roomData[idx].rssi = data.rssi;
           if (data.uptime !== undefined) roomData[idx].uptime = data.uptime;
-          
           if (data.cmd === "E1") {
             if (!roomData[idx].cbActive) { roomData[idx].cbActive = true; roomData[idx].cbStart = now; roomData[idx].cbElapsed = 0; }
           } else if (data.cmd === "A1") {
@@ -335,7 +156,6 @@
         renderDashboard();
       }
     });
-
     function unlockAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -345,7 +165,6 @@
       }
       document.getElementById('audio-banner').style.display = 'none';
     }
-
     function playTone(frequency, duration) {
       if (!audioCtx) return;
       try {
@@ -360,7 +179,6 @@
         oscillator.stop(audioCtx.currentTime + duration);
       } catch(e) { console.log("Audio play error:", e); }
     }
-
     function switchTab(tabName, evt) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -371,7 +189,6 @@
       }
       evt.currentTarget.classList.add('active');
     }
-
     function updateClock() {
       let now = new Date();
       document.getElementById('live-clock').innerText = now.toLocaleString('en-US', { 
@@ -381,25 +198,21 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
-
     function formatTime(seconds) {
       let mins = Math.floor(seconds / 60);
       let secs = seconds % 60;
       return (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
     }
-
     function formatUptime(totalSecs) {
       let hrs = Math.floor(totalSecs / 3600);
       let mins = Math.floor((totalSecs % 3600) / 60);
       let secs = totalSecs % 60;
       return hrs + "h " + mins + "m " + secs + "s";
     }
-
     function renderDashboard() {
       let gridHTML = "";
       let hasCodeBlue = false;
       let hasAssist = false;
-
       for (let i = 0; i < roomData.length; i++) {
         let r = roomData[i];
         let cardCls = "standby";
@@ -408,10 +221,8 @@
         let astCls = "";
         let emgText = "CODE BLUE";
         let astText = "ASSISTANCE";
-
         if (r.cbActive) hasCodeBlue = true;
         if (r.astActive) hasAssist = true;
-
         if (r.cbActive && r.astActive) {
           cardCls = "both"; stbCls = "";
           emgCls = "active-red"; astCls = "active-orange";
@@ -426,7 +237,6 @@
           astCls = "active-orange";
           astText += `<span class="timer">(${formatTime(r.astElapsed)})</span>`;
         }
-
         let telemetryHTML = "";
         if (r.online) {
           telemetryHTML = `
@@ -442,7 +252,6 @@
             </div>
           `;
         }
-
         gridHTML += `
           <div class="card ${cardCls}">
             <h3>ROOM ${i + 1}</h3>
@@ -456,7 +265,6 @@
         `;
       }
       document.getElementById('dashboard-grid').innerHTML = gridHTML;
-
       let now = Date.now();
       if (hasCodeBlue) {
         if (now - lastBeepTime > 500) { playTone(1000, 0.30); lastBeepTime = now; }
@@ -464,11 +272,9 @@
         if (now - lastBeepTime > 1500) { playTone(600, 0.2); lastBeepTime = now; }
       }
     }
-
     function sendAction(roomNum, cmd) {
       let idx = roomNum - 1;
       let now = Date.now();
-      
       if (cmd === 'E1') {
         if (!roomData[idx].cbActive) { roomData[idx].cbActive = true; roomData[idx].cbStart = now; roomData[idx].cbElapsed = 0; }
       } else if (cmd === 'A1') {
@@ -477,20 +283,17 @@
         roomData[idx].cbActive = false; roomData[idx].astActive = false;
       }
       renderDashboard();
-
       let topic = "hospital/room/" + roomNum + "/command";
       client.publish(topic, cmd);
     }
-
     setInterval(() => {
       let updated = false;
-      for (let i = 0; i < roomData.length; i++) {
-        if (roomData[i].cbActive) { roomData[i].cbElapsed++; updated = true; }
-        if (roomData[i].astActive) { roomData[i].astElapsed++; updated = true; }
+      for(let i=0; i<roomData.length; i++) {
+        if(roomData[i].cbActive) { roomData[i].cbElapsed++; updated = true; }
+        if(roomData[i].astActive) { roomData[i].astElapsed++; updated = true; }
       }
-      if (updated) renderDashboard();
+      if(updated) renderDashboard();
     }, 1000);
-
     renderDashboard();
   </script>
 </body>
