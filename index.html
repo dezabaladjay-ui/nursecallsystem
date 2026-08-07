@@ -96,6 +96,20 @@
         <button class="action-btn btn-reset" onclick="sendAction(3, 'R')">Full Reset</button>
       </div>
     </div>
+    <h4>Room 4 Controls</h4>
+      <div class="btn-grid">
+        <button class="action-btn btn-blue" onclick="sendAction(4, 'E1')">Trigger Code Blue</button>
+        <button class="action-btn btn-assist" onclick="sendAction(4, 'A1')">Trigger Assist</button>
+        <button class="action-btn btn-reset" onclick="sendAction(4, 'R')">Full Reset</button>
+      </div>
+    </div>
+  <h4>Room 5 Controls</h4>
+      <div class="btn-grid">
+        <button class="action-btn btn-blue" onclick="sendAction(5, 'E1')">Trigger Code Blue</button>
+        <button class="action-btn btn-assist" onclick="sendAction(5, 'A1')">Trigger Assist</button>
+        <button class="action-btn btn-reset" onclick="sendAction(5, 'R')">Full Reset</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -123,10 +137,12 @@
     let roomData = [
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
-      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }
+      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
+      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }, 
+      { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }  
+];
     ];
-
-    // Connect securely using variables loaded from config.js (Declared ONCE)
+    
    const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
   clientId: 'WebDashboard_' + Math.random().toString(16).substring(2, 8),
   username: MQTT_CONFIG.MQTT_USER,
@@ -156,7 +172,7 @@
       let parts = topic.split('/');
       let roomNum = parseInt(parts[2]);
 
-      if (roomNum >= 1 && roomNum <= 3) {
+      if (roomNum >= 1 && roomNum <= 5) {
         let idx = roomNum - 1;
         let now = Date.now();
         
