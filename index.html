@@ -87,6 +87,7 @@
   <script>
     let audioCtx = null;
     let lastBeepTime = 0;
+
     setInterval(() => {
       let now = Date.now();
       let needsRender = false;
@@ -100,30 +101,36 @@
         renderDashboard();
       }
     }, 3000);
+
     let roomData = [
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false },
       { cbActive: false, cbStart: 0, cbElapsed: 0, astActive: false, astStart: 0, astElapsed: 0, rssi: 0, uptime: 0, online: false }
     ];
+
     const client = mqtt.connect(MQTT_CONFIG.MQTT_BROKER, {
       clientId: 'WebDashboard_' + Math.random().toString(16).substring(2, 8),
       username: MQTT_CONFIG.MQTT_USER,
       password: MQTT_CONFIG.MQTT_PASSWORD,
       clean: true
     });
+
     client.on('connect', function () {
       document.getElementById('connection-status').innerText = "Status: Connected to Cloud ✔";
       document.getElementById('connection-status').style.color = "green";
       client.subscribe('hospital/room/+/event');
     });
+
     client.on('error', function (err) {
       document.getElementById('connection-status').innerText = "Status: Connection Error!";
       console.log("MQTT Error: ", err);
     });
+
     client.on('offline', function () {
       document.getElementById('connection-status').innerText = "Status: Offline";
       document.getElementById('connection-status').style.color = "red";
     });
+
     client.on('message', function (topic, payload) {
       let message = payload.toString();
       let parts = topic.split('/');
@@ -156,6 +163,7 @@
         renderDashboard();
       }
     });
+
     function unlockAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -165,6 +173,7 @@
       }
       document.getElementById('audio-banner').style.display = 'none';
     }
+
     function playTone(frequency, duration) {
       if (!audioCtx) return;
       try {
@@ -179,6 +188,7 @@
         oscillator.stop(audioCtx.currentTime + duration);
       } catch(e) { console.log("Audio play error:", e); }
     }
+
     function switchTab(tabName, evt) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -189,6 +199,7 @@
       }
       evt.currentTarget.classList.add('active');
     }
+
     function updateClock() {
       let now = new Date();
       document.getElementById('live-clock').innerText = now.toLocaleString('en-US', { 
@@ -198,17 +209,20 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
+
     function formatTime(seconds) {
       let mins = Math.floor(seconds / 60);
       let secs = seconds % 60;
       return (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
     }
+
     function formatUptime(totalSecs) {
       let hrs = Math.floor(totalSecs / 3600);
       let mins = Math.floor((totalSecs % 3600) / 60);
       let secs = totalSecs % 60;
       return hrs + "h " + mins + "m " + secs + "s";
     }
+
     function renderDashboard() {
       let gridHTML = "";
       let hasCodeBlue = false;
@@ -272,6 +286,7 @@
         if (now - lastBeepTime > 1500) { playTone(600, 0.2); lastBeepTime = now; }
       }
     }
+
     function sendAction(roomNum, cmd) {
       let idx = roomNum - 1;
       let now = Date.now();
@@ -286,14 +301,16 @@
       let topic = "hospital/room/" + roomNum + "/command";
       client.publish(topic, cmd);
     }
+
     setInterval(() => {
       let updated = false;
-      for(let i=0; i<roomData.length; i++) {
-        if(roomData[i].cbActive) { roomData[i].cbElapsed++; updated = true; }
-        if(roomData[i].astActive) { roomData[i].astElapsed++; updated = true; }
+      for (let i = 0; i < roomData.length; i++) {
+        if (roomData[i].cbActive) { roomData[i].cbElapsed++; updated = true; }
+        if (roomData[i].astActive) { roomData[i].astElapsed++; updated = true; }
       }
-      if(updated) renderDashboard();
+      if (updated) renderDashboard();
     }, 1000);
+
     renderDashboard();
   </script>
 </body>
